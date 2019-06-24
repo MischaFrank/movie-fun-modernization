@@ -18,6 +18,7 @@ package org.superbiz.moviefun.albums;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.superbiz.moviefun.albums.model.Album;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.superbiz.moviefun.albums;
+package org.superbiz.moviefun.albums.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

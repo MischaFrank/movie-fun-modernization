@@ -16,4 +16,7 @@ dependencies {
     compile "org.apache.tika:tika-core:1.14"
     compile "com.amazonaws:aws-java-sdk:1.11.74"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.7.0"
+
+    compile project(":components:albums-model")
+
 }
