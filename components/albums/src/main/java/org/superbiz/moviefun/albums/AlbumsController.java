@@ -15,13 +15,14 @@ import org.superbiz.moviefun.blobstore.BlobStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
-@Controller
+@RestController
 @RequestMapping("/albums")
 public class AlbumsController {
 
@@ -34,68 +35,25 @@ public class AlbumsController {
         this.blobStore = blobStore;
     }
 
-
     @GetMapping
-    public String index(Map<String, Object> model) {
-        model.put("albums", albumsBean.getAlbums());
-        return "albums";
+    public List<Album> list() {
+        return albumsBean.getAlbums();
     }
 
-    @GetMapping("/{albumId}")
-    public String details(@PathVariable long albumId, Map<String, Object> model) {
-        model.put("album", albumsBean.find(albumId));
-        return "albumDetails";
+    @PutMapping
+    public void addAlbum(@RequestBody Album album) {
+        logger.info("sind da");
+        albumsBean.addAlbum(album);
+        logger.info("album added by controller");
     }
 
-    @PostMapping("/{albumId}/cover")
-    public String uploadCover(@PathVariable Long albumId, @RequestParam("file") MultipartFile uploadedFile) {
-        logger.debug("Uploading cover for album with id {}", albumId);
-
-        if (uploadedFile.getSize() > 0) {
-            try {
-                tryToUploadCover(albumId, uploadedFile);
-
-            } catch (IOException e) {
-                logger.warn("Error while uploading album cover", e);
-            }
-        }
-
-        return format("redirect:/albums/%d", albumId);
-    }
-
-    @GetMapping("/{albumId}/cover")
-    public HttpEntity<byte[]> getCover(@PathVariable long albumId) throws IOException, URISyntaxException {
-        Optional<Blob> maybeCoverBlob = blobStore.get(getCoverBlobName(albumId));
-        Blob coverBlob = maybeCoverBlob.orElseGet(this::buildDefaultCoverBlob);
-
-        byte[] imageBytes = IOUtils.toByteArray(coverBlob.inputStream);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(coverBlob.contentType));
-        headers.setContentLength(imageBytes.length);
-
-        return new HttpEntity<>(imageBytes, headers);
+    @GetMapping("/{id}")
+    public Album getAlbum(@PathVariable Long id) {
+        return albumsBean.find(id);
     }
 
 
-    private void tryToUploadCover(@PathVariable Long albumId, @RequestParam("file") MultipartFile uploadedFile) throws IOException {
-        Blob coverBlob = new Blob(
-            getCoverBlobName(albumId),
-            uploadedFile.getInputStream(),
-            uploadedFile.getContentType()
-        );
 
-        blobStore.put(coverBlob);
-    }
 
-    private Blob buildDefaultCoverBlob() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream input = classLoader.getResourceAsStream("default-cover.jpg");
 
-        return new Blob("default-cover", input, MediaType.IMAGE_JPEG_VALUE);
-    }
-
-    private String getCoverBlobName(@PathVariable long albumId) {
-        return format("covers/%d", albumId);
-    }
 }

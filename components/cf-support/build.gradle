@@ -1,0 +1,10 @@
+apply from: "../../java.gradle"
+
+group = "org.superbiz"
+version = "1.1.0-SNAPSHOT"
+description = "OpenEJB :: Web Examples :: Moviefun"
+
+dependencies {
+
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.7.0"
+}
